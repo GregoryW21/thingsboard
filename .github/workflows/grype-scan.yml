@@ -1,0 +1,33 @@
+name: "Security Scan: Syft & Grype"
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  security-scan:
+    runs-on: ubuntu-latest
+    
+    # Basic permissions needed just to read your code
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Generate SBOM with Syft
+        uses: anchore/sbom-action@v0
+        with:
+          path: "."
+          format: "spdx-json"
+          output-file: "sbom.spdx.json"
+
+      - name: Scan SBOM with Grype
+        uses: anchore/scan-action@v7
+        with:
+          sbom: "sbom.spdx.json"
+          # Set to false so the workflow doesn't crash; it just shows you the list
+          fail-build: false
