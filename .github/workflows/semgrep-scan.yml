@@ -1,0 +1,24 @@
+name: Security Scan: Semgrep
+
+on:
+  workflow_dispatch: # Manual trigger only
+
+jobs:
+  semgrep-sast:
+    runs-on: ubuntu-latest
+    name: Run Semgrep SAST
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Run Semgrep Scan
+        # We run Semgrep via Docker and save the output directly to a text file
+        run: |
+          docker run --rm -v "${{ github.workspace }}:/src" semgrep/semgrep semgrep scan --config=auto --text --output=/src/semgrep-results.txt || true
+
+      - name: Upload Readable Results
+        uses: actions/upload-artifact@v4
+        with:
+          name: semgrep-security-report
+          path: semgrep-results.txt
