@@ -1,33 +1,24 @@
-name: "Security Scan: Syft & Grype"
+name: Grype Vulnerability Scan
 
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+  # Allows you to trigger the scan manually
+  workflow_dispatch: 
 
 jobs:
-  security-scan:
+  grype-scan:
     runs-on: ubuntu-latest
+    name: Run Grype SCA
     
-    # Basic permissions needed just to read your code
-    permissions:
-      contents: read
-
     steps:
-      - name: Checkout Code
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Generate SBOM with Syft
-        uses: anchore/sbom-action@v0
-        with:
-          path: "."
-          format: "spdx-json"
-          output-file: "sbom.spdx.json"
-
-      - name: Scan SBOM with Grype
+      - name: Run Anchore Grype Scan
         uses: anchore/scan-action@v7
         with:
-          sbom: "sbom.spdx.json"
-          # Set to false so the workflow doesn't crash; it just shows you the list
+          # Tells Grype to scan the entire repository directory
+          path: "."
+          
+          # Set to false so the workflow doesn't crash on the first vulnerability it finds.
+          # This allows you to see the complete list in the logs.
           fail-build: false
