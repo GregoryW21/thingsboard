@@ -12,24 +12,22 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Run Trivy Filesystem Scan
-        uses: aquasecurity/trivy-action@master
+      - name: Install Trivy Native CLI
+        # This safely provisions the exact, official Trivy command line tool
+        uses: aquasecurity/setup-trivy@v0.2.6
         with:
-          scan-type: 'fs'
-          scan-ref: '.'
-          format: 'table'
-          output: 'trivy-results.txt'
-          severity: 'MEDIUM,HIGH,CRITICAL'
-          
-          # --- FIXES ADDED HERE ---
-          # 1. Focus only on vulnerabilities to speed it up
-          scanners: 'vuln' 
-          
-          # 2. Give Trivy up to 15 minutes to finish scanning this massive repo
-          timeout: '15m0s' 
-          
-          # 3. Don't crash the workflow build on findings
-          exit-code: '0'
+          version: 'latest'
+
+      - name: Run Trivy Scan via Shell
+        # By running the raw command, we gain absolute control over the execution flags
+        run: |
+          trivy fs . \
+            --scanners vuln \
+            --severity MEDIUM,HIGH,CRITICAL \
+            --timeout 20m \
+            --concurrency 1 \
+            --format table \
+            --output trivy-results.txt
 
       - name: Upload Readable Results
         uses: actions/upload-artifact@v4
