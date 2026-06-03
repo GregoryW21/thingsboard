@@ -17,10 +17,19 @@ jobs:
         with:
           scan-type: 'fs'
           scan-ref: '.'
-          format: 'table'          # Generates a clean text table
-          output: 'trivy-results.txt' # Saves it to this file
+          format: 'table'
+          output: 'trivy-results.txt'
           severity: 'MEDIUM,HIGH,CRITICAL'
-          exit-code: '0'            # Prevents the workflow from crashing if bugs are found
+          
+          # --- FIXES ADDED HERE ---
+          # 1. Focus only on vulnerabilities to speed it up
+          scanners: 'vuln' 
+          
+          # 2. Give Trivy up to 15 minutes to finish scanning this massive repo
+          timeout: '15m0s' 
+          
+          # 3. Don't crash the workflow build on findings
+          exit-code: '0'
 
       - name: Upload Readable Results
         uses: actions/upload-artifact@v4
