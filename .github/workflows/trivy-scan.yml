@@ -1,0 +1,29 @@
+name: "Security Scan: Trivy"
+
+on:
+  workflow_dispatch: # Manual trigger only
+
+jobs:
+  trivy-scan:
+    runs-on: ubuntu-latest
+    name: Run Trivy Scanner
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Run Trivy Filesystem Scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'table'          # Generates a clean text table
+          output: 'trivy-results.txt' # Saves it to this file
+          severity: 'MEDIUM,HIGH,CRITICAL'
+          exit-code: '0'            # Prevents the workflow from crashing if bugs are found
+
+      - name: Upload Readable Results
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-security-report
+          path: trivy-results.txt
