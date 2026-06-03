@@ -19,9 +19,11 @@ jobs:
 
       - name: Run Trivy Scan via Shell
         run: |
-          # STRICTLY target infrastructure misconfigurations 
+          # We explicitly skip the massive Java code directories (common, application)
+          # to stop the file walker from crashing the runner.
           trivy fs . \
             --scanners misconfig \
+            --skip-dirs common,application \
             --timeout 15m \
             --format table \
             --output trivy-results.txt
