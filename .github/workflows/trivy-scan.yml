@@ -19,11 +19,11 @@ jobs:
 
       - name: Run Trivy Scan via Shell
         run: |
-          # We explicitly skip the massive Java code directories (common, application)
-          # to stop the file walker from crashing the runner.
+          # We force Trivy to ignore EVERY SINGLE pom.xml file in the entire project.
+          # This protects the runner's memory while still scanning the Dockerfiles.
           trivy fs . \
             --scanners misconfig \
-            --skip-dirs common,application \
+            --skip-files "**/pom.xml" \
             --timeout 15m \
             --format table \
             --output trivy-results.txt
