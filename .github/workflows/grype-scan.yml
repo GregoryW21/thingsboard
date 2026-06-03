@@ -22,3 +22,4 @@ jobs:
           # Set to false so the workflow doesn't crash on the first vulnerability it finds.
           # This allows you to see the complete list in the logs.
           fail-build: false
+          output-format: table 
