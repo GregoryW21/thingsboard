@@ -13,19 +13,17 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install Trivy Native CLI
-        # This safely provisions the exact, official Trivy command line tool
         uses: aquasecurity/setup-trivy@v0.2.6
         with:
           version: 'latest'
 
       - name: Run Trivy Scan via Shell
-        # By running the raw command, we gain absolute control over the execution flags
         run: |
           trivy fs . \
             --scanners vuln \
             --severity MEDIUM,HIGH,CRITICAL \
             --timeout 20m \
-            --concurrency 1 \
+            --parallel 1 \
             --format table \
             --output trivy-results.txt
 
