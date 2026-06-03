@@ -1,0 +1,35 @@
+name: "Security Scan: Fuzzing"
+
+on:
+  workflow_dispatch: # Manual trigger only
+
+jobs:
+  api-fuzz:
+    runs-on: ubuntu-latest
+    name: Run Ffuf Web Fuzzer
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Download Fuzzing Wordlist
+        run: |
+          # Downloads a reliable top-100 list of common web/API endpoints to test against
+          curl -s https://raw.githubusercontent.com/danielmiessler/SecLists/master/Discovery/Web-Content/api-endpoints-top100.txt -o wordlist.txt
+
+      - name: Execute Ffuf Fuzzing Attack
+        # IMPORTANT: Replace YOUR_PUBLIC_IP with your router's public IP address
+        run: |
+          docker run --rm -v ${{ github.workspace }}:/v \
+            ffuf/ffuf -w /v/wordlist.txt \
+            -u http://YOUR_PUBLIC_IP:8080/FUZZ \
+            -o /v/fuzz-results.txt -of md || true
+          
+          # Fallback check to ensure the file exists even if no items matched
+          touch fuzz-results.txt
+
+      - name: Upload Readable Results
+        uses: actions/upload-artifact@v4
+        with:
+          name: fuzzing-security-report
+          path: fuzz-results.txt

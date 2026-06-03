@@ -1,0 +1,32 @@
+name: "Security Scan: Checkov"
+
+on:
+  workflow_dispatch: # Manual trigger only
+
+jobs:
+  checkov-iac:
+    runs-on: ubuntu-latest
+    name: Run Checkov Scanner
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Checkov
+        run: pip install checkov
+
+      - name: Run Checkov Configuration Scan
+        # We save the command line interface (cli) printout straight to a text file
+        run: |
+          checkov -d . --output cli > checkov-results.txt || true
+
+      - name: Upload Readable Results
+        uses: actions/upload-artifact@v4
+        with:
+          name: checkov-security-report
+          path: checkov-results.txt
