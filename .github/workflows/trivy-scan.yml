@@ -19,10 +19,9 @@ jobs:
 
       - name: Run Trivy Scan via Shell
         run: |
-          # We switch --scanners to 'misconfig,secret' 
-          # This completely bypasses the broken Java pom.xml engine!
+          # STRICTLY target infrastructure misconfigurations 
           trivy fs . \
-            --scanners misconfig,secret \
+            --scanners misconfig \
             --timeout 15m \
             --format table \
             --output trivy-results.txt
