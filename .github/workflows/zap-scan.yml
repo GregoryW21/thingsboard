@@ -21,4 +21,5 @@ jobs:
         with:
           # REPLACE THIS with the actual URL of your running test server or application
           target: 'http://101.78.195.62:8080/' 
-          fail_action: false
+          fail_action: true
+          create_issue: false
