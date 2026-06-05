@@ -1,0 +1,24 @@
+name: "OWASP ZAP Baseline Scan"
+
+on:
+  workflow_dispatch: # Manual trigger only
+
+jobs:
+  zap_scan:
+    runs-on: ubuntu-latest
+    name: Scan the web application
+    
+    permissions:
+      contents: read
+      issues: write
+      
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: ZAP Scan
+        uses: zaproxy/action-baseline@v0.12.0
+        with:
+          # REPLACE THIS with the actual URL of your running test server or application
+          target: 'http://101.78.195.62:8080/' 
+          fail_action: false
